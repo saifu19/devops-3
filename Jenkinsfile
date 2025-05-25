@@ -83,21 +83,24 @@ pipeline {
                     
                     # Wait for MySQL using a different approach
                     echo "Waiting for MySQL to start..."
-                    for i in {1..10}; do
-                        if docker exec ${MYSQL_CONTAINER} mysql -u root -p ${MYSQL_ROOT_PASSWORD} -e "SELECT 1;" 2>/dev/null; then
+                    sleep 30
+                    for i in 1 2 3 4 5 6 7 8 9 10; do
+                        if docker exec ${MYSQL_CONTAINER} mysql -u root -prootpassword -e "SELECT 1;" 2>/dev/null; then
                             echo "MySQL is ready!"
                             break
                         fi
                         echo "Waiting for MySQL... attempt $i/10"
-                        sleep 10
+                        sleep 15
                     done
                     
                     # Test actual connection
-                    docker exec ${MYSQL_CONTAINER} mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1;" || {
+                    docker exec ${MYSQL_CONTAINER} mysql -u root -prootpassword -e "SELECT 1;" || {
                         echo "MySQL connection test failed"
                         docker logs ${MYSQL_CONTAINER}
                         exit 1
                     }
+                    
+                    echo "MySQL connection verified"
                     
                     # Build application Docker image
                     docker build -t ${DOCKER_IMAGE} .
@@ -107,7 +110,7 @@ pipeline {
                         --name ${CONTAINER_NAME} \
                         --network ${DOCKER_NETWORK} \
                         --network-alias app \
-                        -e DB_HOST=localhost \
+                        -e DB_HOST=mysql \
                         -e DB_NAME=${MYSQL_DATABASE} \
                         -e DB_USER=root \
                         -e DB_PASSWORD=${MYSQL_ROOT_PASSWORD} \
