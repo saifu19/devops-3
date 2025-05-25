@@ -2,28 +2,28 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install system dependencies including Chrome
+# Install system dependencies for Chrome
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     unzip \
     curl \
-    && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Google Chrome
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list \
     && apt-get update \
     && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy test requirements and install
+# Install Python dependencies
 COPY test-requirements.txt .
 RUN pip install --no-cache-dir -r test-requirements.txt
 
 # Copy test files
-COPY selenium_tests/ ./selenium_tests/
-
-# Set environment variables
-ENV PYTHONPATH=/app
-ENV APP_URL=http://app:5000
+COPY selenium_tests/ selenium_tests/
+COPY templates/ templates/
 
 # Run tests
-CMD ["python", "-m", "pytest", "selenium_tests/", "-v", "--tb=short"] 
+CMD ["python", "-m", "pytest", "selenium_tests/", "-v", "-s"] 
