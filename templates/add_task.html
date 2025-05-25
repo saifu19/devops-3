@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Add Task - Task Manager{% endblock %}
+
+{% block content %}
+<h1>Add New Task</h1>
+
+<form method="POST" class="mt-4">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" class="form-control" id="title" name="title" required>
+    </div>
+    
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+    </div>
+    
+    <button type="submit" class="btn btn-primary" id="submit-btn">Add Task</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %} 
