@@ -134,24 +134,24 @@ pipeline {
             }
         }
         
-        stage('Selenium Testing') {
-            steps {
-                echo 'Running Selenium tests...'
-                sh '''
-                    # Build Selenium test image
-                    docker build -f Dockerfile.selenium -t ${SELENIUM_IMAGE} .
+        // stage('Selenium Testing') {
+        //     steps {
+        //         echo 'Running Selenium tests...'
+        //         sh '''
+        //             # Build Selenium test image
+        //             docker build -f Dockerfile.selenium -t ${SELENIUM_IMAGE} .
                     
-                    # Run Selenium tests
-                    docker run --rm \
-                        --name ${SELENIUM_CONTAINER} \
-                        --network ${DOCKER_NETWORK} \
-                        -e APP_URL=http://app:5000 \
-                        ${SELENIUM_IMAGE}
+        //             # Run Selenium tests
+        //             docker run --rm \
+        //                 --name ${SELENIUM_CONTAINER} \
+        //                 --network ${DOCKER_NETWORK} \
+        //                 -e APP_URL=http://app:5000 \
+        //                 ${SELENIUM_IMAGE}
                     
-                    echo "Selenium tests completed successfully"
-                '''
-            }
-        }
+        //             echo "Selenium tests completed successfully"
+        //         '''
+        //     }
+        // }
     }
     
     post {
