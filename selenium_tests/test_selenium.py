@@ -19,6 +19,12 @@ class TestTaskManagerApp:
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--disable-web-security")
+        chrome_options.add_argument("--allow-running-insecure-content")
+        chrome_options.add_argument("--ignore-ssl-errors")
+        chrome_options.add_argument("--ignore-certificate-errors")
+        chrome_options.add_argument("--ignore-certificate-errors-spki-list")
+        chrome_options.add_argument("--disable-extensions")
         
         # Use explicit path to chromedriver
         service = Service('/usr/bin/chromedriver')
