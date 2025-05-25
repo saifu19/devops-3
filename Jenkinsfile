@@ -107,7 +107,7 @@ pipeline {
                         --name ${CONTAINER_NAME} \
                         --network ${DOCKER_NETWORK} \
                         --network-alias app \
-                        -e DB_HOST=mysql \
+                        -e DB_HOST=localhost \
                         -e DB_NAME=${MYSQL_DATABASE} \
                         -e DB_USER=root \
                         -e DB_PASSWORD=${MYSQL_ROOT_PASSWORD} \
