@@ -10,7 +10,7 @@ RUN apt update && apt install -y \
     unzip \
     && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt-get install ./google-chrome-stable_current_amd64.deb -y \
-    && wget https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.85/linux64/chromedriver-linux64.zip \
+    && wget https://storage.googleapis.com/chrome-for-testing-public/136.0.7103.113/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver \
     && chown root:root /usr/bin/chromedriver \
@@ -27,4 +27,4 @@ COPY selenium_tests/ selenium_tests/
 COPY templates/ templates/
 
 # Run the tests
-CMD ["python", "-m", "pytest", "selenium_tests/", "-v", "-s"] 
+CMD ["python", "-m", "pytest", "selenium_tests/", "-v", "-s"]
