@@ -84,7 +84,7 @@ pipeline {
                     # Wait for MySQL using a different approach
                     echo "Waiting for MySQL to start..."
                     for i in {1..10}; do
-                        if docker exec ${MYSQL_CONTAINER} mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1;" 2>/dev/null; then
+                        if docker exec ${MYSQL_CONTAINER} mysql -u root -p ${MYSQL_ROOT_PASSWORD} -e "SELECT 1;" 2>/dev/null; then
                             echo "MySQL is ready!"
                             break
                         fi
