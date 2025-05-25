@@ -81,13 +81,10 @@ pipeline {
                         -p 3306:3306 \
                         ${MYSQL_IMAGE}
                     
-                    # Wait for MySQL to be ready
+                    # Wait for MySQL using a different approach
                     echo "Waiting for MySQL to start..."
-                    sleep 90
-                    
-                    # Check MySQL health with retries
                     for i in {1..10}; do
-                        if docker exec ${MYSQL_CONTAINER} mysqladmin ping -h localhost --silent; then
+                        if docker exec ${MYSQL_CONTAINER} mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1;" 2>/dev/null; then
                             echo "MySQL is ready!"
                             break
                         fi
@@ -95,10 +92,17 @@ pipeline {
                         sleep 10
                     done
                     
+                    # Test actual connection
+                    docker exec ${MYSQL_CONTAINER} mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1;" || {
+                        echo "MySQL connection test failed"
+                        docker logs ${MYSQL_CONTAINER}
+                        exit 1
+                    }
+                    
                     # Build application Docker image
                     docker build -t ${DOCKER_IMAGE} .
                     
-                    # Run the application container
+                    # Run application container
                     docker run -d \
                         --name ${CONTAINER_NAME} \
                         --network ${DOCKER_NETWORK} \
@@ -113,19 +117,16 @@ pipeline {
                     
                     # Wait for application to start
                     echo "Waiting for application to start..."
-                    sleep 60
-                    
-                    # Health check with retries
                     for i in {1..10}; do
-                        if docker exec ${CONTAINER_NAME} curl -f http://localhost:5000/health; then
+                        if docker exec ${CONTAINER_NAME} curl -f http://localhost:5000/health 2>/dev/null; then
                             echo "Application is healthy!"
                             break
                         fi
-                        echo "Waiting for application... attempt $i/10"
+                        echo "Application starting... attempt $i/10"
                         sleep 10
                     done
                     
-                    echo "Application deployed successfully"
+                    echo "Deployment completed"
                 '''
             }
         }
