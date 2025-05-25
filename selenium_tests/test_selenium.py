@@ -1,5 +1,7 @@
 import pytest
 import os
+import time
+import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -14,27 +16,60 @@ class TestTaskManagerApp:
         """Setup Chrome driver"""
         print("Setting up Selenium WebDriver...")
         
+        # First, test connectivity to the Flask app
+        self.base_url = os.environ.get('APP_URL', 'http://app:5000')
+        self._wait_for_app()
+        
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--window-size=1920,1080")
+        
+        # More comprehensive SSL and security flags
         chrome_options.add_argument("--disable-web-security")
         chrome_options.add_argument("--allow-running-insecure-content")
         chrome_options.add_argument("--ignore-ssl-errors")
         chrome_options.add_argument("--ignore-certificate-errors")
         chrome_options.add_argument("--ignore-certificate-errors-spki-list")
         chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-plugins")
+        chrome_options.add_argument("--disable-images")
+        chrome_options.add_argument("--disable-javascript")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-first-run")
+        chrome_options.add_argument("--no-default-browser-check")
+        chrome_options.add_argument("--disable-default-apps")
+        chrome_options.add_argument("--disable-popup-blocking")
         
         # Use explicit path to chromedriver
         service = Service('/usr/bin/chromedriver')
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
-        self.base_url = os.environ.get('APP_URL', 'http://app:5000')
         
         yield
         
         if hasattr(self, 'driver'):
             self.driver.quit()
+    
+    def _wait_for_app(self):
+        """Wait for the Flask app to be ready"""
+        print(f"Waiting for app at {self.base_url} to be ready...")
+        
+        max_retries = 30
+        for i in range(max_retries):
+            try:
+                response = requests.get(self.base_url, timeout=5)
+                if response.status_code == 200:
+                    print(f"App is ready! Status: {response.status_code}")
+                    return
+                else:
+                    print(f"App returned status {response.status_code}, retrying...")
+            except requests.exceptions.RequestException as e:
+                print(f"Attempt {i+1}/{max_retries}: {e}")
+            
+            time.sleep(2)
+        
+        raise Exception(f"App at {self.base_url} is not ready after {max_retries * 2} seconds")
     
     def test_homepage_loads(self):
         """Test that the homepage loads successfully"""
